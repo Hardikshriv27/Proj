@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Expense</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>Add Expense</h1>
+
+<form method="POST">
+
+    <label>Name:</label>
+    <input type="text" name="name" required>
+
+    <label>Amount (₹):</label>
+    <input type="number" name="amount" required>
+
+    <label>Category:</label>
+    <select name="category">
+        <option>Food</option>
+        <option>Travel</option>
+        <option>Shopping</option>
+        <option>Other</option>
+    </select>
+
+    <label>Date:</label>
+    <input type="date" name="date" required>
+
+    <button type="submit">Add</button>
+</form>
+
+<br>
+<a href="/">⬅ Back</a>
+
+</body>
+</html>

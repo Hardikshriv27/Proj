@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>💰 Expense Tracker (₹)</h1>
+
+<a href="/add">➕ Add Expense</a>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Amount (₹)</th>
+        <th>Category</th>
+        <th>Date</th>
+        <th>Action</th>
+    </tr>
+
+    {% for row in data %}
+    <tr>
+        <td>{{ row[1] }}</td>
+        <td>₹ {{ row[2] }}</td>
+        <td>{{ row[3] }}</td>
+        <td>{{ row[4] }}</td>
+        <td><a href="/delete/{{ row[0] }}">Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Total: ₹ {{ total }}</h2>
+
+<hr>
+
+<h2>Expense Distribution</h2>
+
+<canvas id="myChart" width="400" height="200"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const labels = JSON.parse('{{ labels | tojson }}');
+    const values = JSON.parse('{{ values | tojson }}');
+
+    new Chart(document.getElementById('myChart'), {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values
+            }]
+        }
+    });
+</script>
+</body>
+</html>
