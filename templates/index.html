@@ -1,58 +1,198 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Expense Tracker</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Track your daily expenses with beautiful charts and insights." />
+  <title>ExpenseTracker – Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <div class="page-wrapper">
 
-<h1>💰 Expense Tracker (₹)</h1>
+    <!-- NAVBAR -->
+    <nav class="navbar animate-in">
+      <div class="navbar-brand">
+        <div class="brand-icon">💸</div>
+        <div>
+          <span class="brand-text">ExpenseTracker</span>
+          <span class="navbar-sub">Personal Finance Dashboard</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:0.82rem;color:var(--text-muted);">👋 <strong style="color:var(--text-secondary);">{{ username }}</strong></span>
+        <a href="/add" class="btn btn-primary" id="add-expense-btn">
+          <span>＋</span> Add Expense
+        </a>
+        <a href="/logout" class="btn btn-ghost" id="logout-btn" style="padding:10px 16px;font-size:0.85rem;">
+          ⎋ Logout
+        </a>
+      </div>
+    </nav>
 
-<a href="/add">➕ Add Expense</a>
+    <!-- STATS ROW -->
+    <div class="stats-row">
+      <div class="stat-card animate-in animate-delay-1">
+        <div class="stat-label">Total Spent</div>
+        <div class="stat-value">₹{{ "%.0f"|format(total) }}</div>
+        <div class="stat-icon">💰</div>
+      </div>
+      <div class="stat-card animate-in animate-delay-2">
+        <div class="stat-label">Transactions</div>
+        <div class="stat-value">{{ data|length }}</div>
+        <div class="stat-icon">📋</div>
+      </div>
+      <div class="stat-card animate-in animate-delay-3">
+        <div class="stat-label">Categories</div>
+        <div class="stat-value">{{ labels|length }}</div>
+        <div class="stat-icon">🏷️</div>
+      </div>
+    </div>
 
-<table>
-    <tr>
-        <th>Name</th>
-        <th>Amount (₹)</th>
-        <th>Category</th>
-        <th>Date</th>
-        <th>Action</th>
-    </tr>
+    <!-- MAIN CONTENT -->
+    <div class="dashboard-grid">
 
-    {% for row in data %}
-    <tr>
-        <td>{{ row[1] }}</td>
-        <td>₹ {{ row[2] }}</td>
-        <td>{{ row[3] }}</td>
-        <td>{{ row[4] }}</td>
-        <td><a href="/delete/{{ row[0] }}">Delete</a></td>
-    </tr>
-    {% endfor %}
-</table>
+      <!-- EXPENSE TABLE -->
+      <div class="card animate-in animate-delay-1">
+        <div class="card-header">
+          <span class="card-title">
+            <span class="title-dot"></span>
+            Recent Expenses
+          </span>
+          <span style="font-size:0.8rem;color:var(--text-muted);">{{ data|length }} record{% if data|length != 1 %}s{% endif %}</span>
+        </div>
+        <div class="card-body">
+          {% if data %}
+          <table class="expense-table" id="expenses-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for expense in data %}
+              <tr>
+                <td style="font-weight:500;color:var(--text-primary);">{{ expense[1] }}</td>
+                <td class="amount-cell">₹{{ "%.2f"|format(expense[2]) }}</td>
+                <td>
+                  <span class="category-badge {{ expense[3]|lower }}">
+                    {% if expense[3]|lower == 'food' %}🍔
+                    {% elif expense[3]|lower == 'travel' %}✈️
+                    {% elif expense[3]|lower == 'shopping' %}🛍️
+                    {% elif expense[3]|lower == 'bills' %}📄
+                    {% else %}📦
+                    {% endif %}
+                    {{ expense[3] }}
+                  </span>
+                </td>
+                <td class="date-cell">{{ expense[4] }}</td>
+                <td>
+                  <a href="/delete/{{ expense[0] }}" class="btn btn-danger" 
+                     onclick="return confirm('Delete this expense?')" 
+                     id="delete-{{ expense[0] }}">🗑 Delete</a>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state">
+            <span class="empty-icon">🪙</span>
+            <p>No expenses recorded yet</p>
+            <small>Click <strong>Add Expense</strong> to get started!</small>
+          </div>
+          {% endif %}
+        </div>
+      </div>
 
-<h2>Total: ₹ {{ total }}</h2>
+      <!-- CHART CARD -->
+      <div class="card animate-in animate-delay-2">
+        <div class="card-header">
+          <span class="card-title">
+            <span class="title-dot"></span>
+            Spending Breakdown
+          </span>
+        </div>
+        <div class="card-body padded">
+          {% if labels %}
+          <div class="chart-wrapper">
+            <canvas id="myChart"></canvas>
+          </div>
+          {% else %}
+          <div class="empty-state">
+            <span class="empty-icon">📊</span>
+            <p>No chart data yet</p>
+            <small>Add some expenses to see the breakdown.</small>
+          </div>
+          {% endif %}
+        </div>
+      </div>
 
-<hr>
+    </div><!-- /dashboard-grid -->
+  </div><!-- /page-wrapper -->
 
-<h2>Expense Distribution</h2>
+  <script>
+    const labels = {{ labels | tojson }};
+    const values = {{ values | tojson }};
 
-<canvas id="myChart" width="400" height="200"></canvas>
+    if (labels.length > 0) {
+      const COLORS = [
+        'rgba(108, 99, 255, 0.85)',
+        'rgba(168, 85, 247, 0.85)',
+        'rgba(236, 72, 153, 0.85)',
+        'rgba(59, 130, 246, 0.85)',
+        'rgba(16, 185, 129, 0.85)',
+        'rgba(245, 158, 11, 0.85)',
+        'rgba(239, 68, 68, 0.85)',
+      ];
+      const BORDERS = COLORS.map(c => c.replace('0.85', '1'));
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-    const labels = JSON.parse('{{ labels | tojson }}');
-    const values = JSON.parse('{{ values | tojson }}');
-
-    new Chart(document.getElementById('myChart'), {
-        type: 'pie',
+      new Chart(document.getElementById('myChart'), {
+        type: 'doughnut',
         data: {
-            labels: labels,
-            datasets: [{
-                data: values
-            }]
+          labels: labels,
+          datasets: [{
+            data: values,
+            backgroundColor: COLORS.slice(0, labels.length),
+            borderColor: BORDERS.slice(0, labels.length),
+            borderWidth: 2,
+            hoverOffset: 10,
+          }]
+        },
+        options: {
+          responsive: true,
+          cutout: '65%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#94a3b8',
+                font: { family: 'Inter', size: 12, weight: '600' },
+                padding: 16,
+                usePointStyle: true,
+                pointStyleWidth: 10,
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(13, 15, 26, 0.95)',
+              titleColor: '#f1f5f9',
+              bodyColor: '#94a3b8',
+              borderColor: 'rgba(255,255,255,0.1)',
+              borderWidth: 1,
+              padding: 12,
+              callbacks: {
+                label: ctx => ` ₹${ctx.parsed.toFixed(2)}`
+              }
+            }
+          }
         }
-    });
-</script>
+      });
+    }
+  </script>
 </body>
 </html>

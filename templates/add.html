@@ -1,37 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Expense</title>
-    <link rel="stylesheet" href="/static/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Add a new expense entry to your tracker." />
+  <title>ExpenseTracker – Add Expense</title>
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
+  <div class="form-page">
+    <div class="form-container animate-in">
 
-<h1>Add Expense</h1>
+      <!-- BACK LINK -->
+      <a href="/" class="btn btn-ghost" id="back-btn" style="margin-bottom:20px;display:inline-flex;">
+        ← Back to Dashboard
+      </a>
 
-<form method="POST">
+      <!-- FORM CARD -->
+      <div class="form-card">
 
-    <label>Name:</label>
-    <input type="text" name="name" required>
+        <div class="form-card-header">
+          <div class="form-icon">➕</div>
+          <h1>Add Expense</h1>
+          <p>Log a new expense to your tracker</p>
+        </div>
 
-    <label>Amount (₹):</label>
-    <input type="number" name="amount" required>
+        <div class="form-card-body">
+          <form method="POST" action="/add" id="add-expense-form">
 
-    <label>Category:</label>
-    <select name="category">
-        <option>Food</option>
-        <option>Travel</option>
-        <option>Shopping</option>
-        <option>Other</option>
-    </select>
+            <!-- Name -->
+            <div class="form-group">
+              <label class="form-label" for="expense-name">
+                📝 &nbsp;Expense Name
+              </label>
+              <input
+                type="text"
+                id="expense-name"
+                name="name"
+                class="form-control"
+                placeholder="e.g. Lunch at café"
+                required
+                autocomplete="off"
+              />
+            </div>
 
-    <label>Date:</label>
-    <input type="date" name="date" required>
+            <!-- Amount -->
+            <div class="form-group">
+              <label class="form-label" for="expense-amount">
+                💵 &nbsp;Amount (₹)
+              </label>
+              <input
+                type="number"
+                id="expense-amount"
+                name="amount"
+                class="form-control"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
 
-    <button type="submit">Add</button>
-</form>
+            <!-- Category -->
+            <div class="form-group">
+              <label class="form-label" for="expense-category">
+                🏷️ &nbsp;Category
+              </label>
+              <select id="expense-category" name="category" class="form-control" required>
+                <option value="" disabled selected>Choose a category…</option>
+                <option value="Food">🍔 Food</option>
+                <option value="Travel">✈️ Travel</option>
+                <option value="Shopping">🛍️ Shopping</option>
+                <option value="Bills">📄 Bills</option>
+                <option value="Other">📦 Other</option>
+              </select>
+            </div>
 
-<br>
-<a href="/">⬅ Back</a>
+            <!-- Date -->
+            <div class="form-group">
+              <label class="form-label" for="expense-date">
+                📅 &nbsp;Date
+              </label>
+              <input
+                type="date"
+                id="expense-date"
+                name="date"
+                class="form-control"
+                required
+              />
+            </div>
 
+            <!-- Actions -->
+            <div class="form-actions">
+              <a href="/" class="btn btn-ghost" id="cancel-btn">Cancel</a>
+              <button type="submit" class="btn btn-submit" id="submit-btn">
+                ✓ &nbsp;Save Expense
+              </button>
+            </div>
+
+          </form>
+        </div>
+
+      </div><!-- /form-card -->
+    </div><!-- /form-container -->
+  </div><!-- /form-page -->
+
+  <script>
+    // Auto-set today's date
+    const dateInput = document.getElementById('expense-date');
+    if (!dateInput.value) {
+      const today = new Date().toISOString().split('T')[0];
+      dateInput.value = today;
+    }
+
+    // Subtle input focus ripple effect
+    document.querySelectorAll('.form-control').forEach(el => {
+      el.addEventListener('focus', () => {
+        el.style.transform = 'scale(1.01)';
+      });
+      el.addEventListener('blur', () => {
+        el.style.transform = 'scale(1)';
+      });
+    });
+  </script>
 </body>
 </html>

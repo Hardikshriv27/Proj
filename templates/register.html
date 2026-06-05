@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Create your free ExpenseTracker account." />
+  <title>ExpenseTracker – Create Account</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .auth-page::before, .auth-page::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      animation: drift 8s ease-in-out infinite alternate;
+    }
+    .auth-page::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(168,85,247,0.18), transparent 70%);
+      top: -120px; right: -120px;
+    }
+    .auth-page::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(108,99,255,0.12), transparent 70%);
+      bottom: -100px; left: -100px;
+      animation-delay: -4s;
+    }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.1); }
+    }
+    .auth-container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      z-index: 1;
+    }
+    .auth-brand {
+      text-align: center;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.5s ease both;
+    }
+    .auth-brand-icon {
+      width: 72px; height: 72px;
+      border-radius: 24px;
+      background: var(--gradient);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+      margin: 0 auto 14px;
+      box-shadow: 0 8px 32px rgba(108,99,255,0.45);
+      animation: float 3s ease-in-out infinite;
+    }
+    .auth-brand h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+    .auth-brand p { color: var(--text-muted); font-size: 0.88rem; }
+    .auth-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      animation: fadeInUp 0.5s 0.1s ease both;
+    }
+    .auth-card-body { padding: 36px; }
+    .auth-tabs {
+      display: flex;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 28px;
+      border: 1px solid var(--glass-border);
+    }
+    .auth-tab {
+      flex: 1; text-align: center;
+      padding: 10px; border-radius: 9px;
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .auth-tab.active {
+      background: var(--gradient); color: #fff;
+      box-shadow: 0 4px 12px rgba(108,99,255,0.35);
+    }
+    .auth-tab:not(.active):hover { color: var(--text-primary); background: var(--glass-hover); }
+    .alert-error {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 12px; padding: 14px 16px;
+      margin-bottom: 22px; font-size: 0.875rem; color: #fca5a5;
+      animation: shake 0.4s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-6px); }
+      75%      { transform: translateX(6px); }
+    }
+    .input-wrapper { position: relative; }
+    .input-icon {
+      position: absolute; left: 16px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 1rem; pointer-events: none; opacity: 0.5;
+    }
+    .input-wrapper .form-control { padding-left: 44px; }
+    .password-toggle {
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer; font-size: 0.95rem; opacity: 0.45;
+      transition: opacity 0.2s; background: none;
+      border: none; color: var(--text-secondary); padding: 4px;
+    }
+    .password-toggle:hover { opacity: 0.9; }
+    .auth-submit {
+      width: 100%; padding: 15px;
+      font-size: 1rem; font-weight: 700;
+      border-radius: 12px; border: none;
+      background: var(--gradient); color: #fff;
+      cursor: pointer; transition: var(--transition);
+      box-shadow: 0 4px 20px rgba(108,99,255,0.4);
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.01em; margin-top: 6px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .auth-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(108,99,255,0.55); }
+    .auth-submit:active { transform: translateY(0); }
+    .auth-footer {
+      text-align: center; margin-top: 22px;
+      font-size: 0.83rem; color: var(--text-muted);
+    }
+    .auth-footer a {
+      color: #a78bfa; font-weight: 600;
+      text-decoration: none; transition: color 0.2s;
+    }
+    .auth-footer a:hover { color: var(--accent-2); }
+    .strength-bar {
+      height: 3px; border-radius: 2px;
+      background: var(--glass-border);
+      margin-top: 8px; overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%; width: 0%;
+      border-radius: 2px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-container">
+
+      <div class="auth-brand">
+        <div class="auth-brand-icon">💸</div>
+        <h1>ExpenseTracker</h1>
+        <p>Create your free account today</p>
+      </div>
+
+      <div class="auth-card">
+        <div class="auth-card-body">
+
+          <div class="auth-tabs">
+            <a href="/login"    class="auth-tab"        id="login-tab">Sign In</a>
+            <a href="/register" class="auth-tab active"  id="register-tab">Create Account</a>
+          </div>
+
+          {% if error %}
+          <div class="alert-error" id="auth-error">
+            <span>⚠️</span> {{ error }}
+          </div>
+          {% endif %}
+
+          <form method="POST" action="/register" id="register-form">
+
+            <div class="form-group">
+              <label class="form-label" for="reg-username">👤 &nbsp;Username</label>
+              <div class="input-wrapper">
+                <span class="input-icon">@</span>
+                <input type="text" id="reg-username" name="username"
+                  class="form-control" placeholder="Choose a username"
+                  required autocomplete="username" autofocus />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="reg-password">🔒 &nbsp;Password</label>
+              <div class="input-wrapper">
+                <span class="input-icon">🔑</span>
+                <input type="password" id="reg-password" name="password"
+                  class="form-control" placeholder="Create a strong password"
+                  required autocomplete="new-password" minlength="6" />
+                <button type="button" class="password-toggle" id="toggle-pw" title="Toggle visibility">👁</button>
+              </div>
+              <div class="strength-bar">
+                <div class="strength-fill" id="strength-fill"></div>
+              </div>
+            </div>
+
+            <button type="submit" class="auth-submit" id="register-submit-btn">
+              <span>✓</span> Create Account
+            </button>
+
+          </form>
+
+          <div class="auth-footer">
+            Already have an account? <a href="/login" id="go-login">Sign in</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Password toggle
+    const toggle = document.getElementById('toggle-pw');
+    const pwInput = document.getElementById('reg-password');
+    toggle.addEventListener('click', () => {
+      pwInput.type = pwInput.type === 'password' ? 'text' : 'password';
+      toggle.textContent = pwInput.type === 'password' ? '👁' : '🙈';
+    });
+
+    // Password strength indicator
+    const fill = document.getElementById('strength-fill');
+    pwInput.addEventListener('input', () => {
+      const v = pwInput.value;
+      let score = 0;
+      if (v.length >= 6)  score++;
+      if (v.length >= 10) score++;
+      if (/[A-Z]/.test(v)) score++;
+      if (/[0-9]/.test(v)) score++;
+      if (/[^A-Za-z0-9]/.test(v)) score++;
+      const colors = ['#ef4444','#f97316','#eab308','#22c55e','#10b981'];
+      fill.style.width  = (score * 20) + '%';
+      fill.style.background = colors[score - 1] || 'transparent';
+    });
+
+    // Input focus scale
+    document.querySelectorAll('.form-control').forEach(el => {
+      el.addEventListener('focus', () => el.style.transform = 'scale(1.01)');
+      el.addEventListener('blur',  () => el.style.transform = 'scale(1)');
+    });
+  </script>
+</body>
+</html>

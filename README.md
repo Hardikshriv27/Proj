@@ -1,2 +1,0 @@
-# Proj
-about my projects
